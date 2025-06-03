@@ -1,6 +1,6 @@
 export type Point = {
-    x: number;
-    y: number;
+    left: number;
+    top: number;
 };
 
 

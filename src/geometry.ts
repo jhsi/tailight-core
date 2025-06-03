@@ -10,10 +10,10 @@ export function getIntentPolygon(
 
     // Simple triangle from right edge of A to left edge of B
     return [
-        { x: a.left, y: a.top - tolerance }, // top left
-        { x: b.left, y: b.top - tolerance }, // top right
-        { x: b.left, y: b.bottom + tolerance }, // bottom right
-        { x: a.left, y: a.bottom + tolerance }, // bottom left
+        { left: a.left, top: a.top - tolerance }, // top left
+        { left: b.left, top: b.top - tolerance }, // top right
+        { left: b.left, top: b.bottom + tolerance }, // bottom right
+        { left: a.left, top: a.bottom + tolerance }, // bottom left
     ];
 }
 
@@ -24,11 +24,11 @@ export function pointInPolygon(
 ): boolean {
     let inside = false;
     for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-        const xi = vs[i].x, yi = vs[i].y;
-        const xj = vs[j].x, yj = vs[j].y;
+        const xi = vs[i].left, yi = vs[i].top;
+        const xj = vs[j].left, yj = vs[j].top;
 
-        const intersect = yi > point.y !== yj > point.y &&
-            point.x < ((xj - xi) * (point.y - yi)) / (yj - yi) + xi;
+        const intersect = yi > point.top !== yj > point.top &&
+            point.left < ((xj - xi) * (point.top - yi)) / (yj - yi) + xi;
         if (intersect) inside = !inside;
     }
     return inside;

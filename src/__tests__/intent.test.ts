@@ -17,9 +17,10 @@ describe('getIntentPolygon', () => {
 
         const poly = getIntentPolygon(from, to, ZERO_TOLERANCE);
         expect(poly.length).toBe(4);
-        expect(poly[POLYGON_TOP_LEFT]).toEqual({ x: 90, y: 100 });
-        expect(poly[POLYGON_TOP_RIGHT]).toEqual({ x: 200, y: 120 });
-        expect(poly[POLYGON_BOTTOM_RIGHT]).toEqual({ x: 200, y: 160 });
-        expect(poly[POLYGON_BOTTOM_LEFT]).toEqual({ x: 90, y: 150 });
+        expect(poly[POLYGON_TOP_LEFT]).toEqual({ left: 90, top: 100 });
+        expect(poly[POLYGON_TOP_RIGHT]).toEqual({ left: 200, top: 120 });
+        expect(poly[POLYGON_BOTTOM_RIGHT]).toEqual({ left: 200, top: 160 });
+        expect(poly[POLYGON_BOTTOM_LEFT]).toEqual({ left: 90, top: 150 });
+
     });
 });

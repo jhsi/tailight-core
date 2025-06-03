@@ -17,7 +17,7 @@ export function internalCreateDesirePath(config: {
     let polygon = updatePolygon();
 
     function onMouseMove(e: MouseEvent) {
-        const point = { x: e.clientX, y: e.clientY };
+        const point = { left: e.clientX, top: e.clientY };
         const inside = pointInPolygon(point, polygon);
 
         if (inside && !isInside) {

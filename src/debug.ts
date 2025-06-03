@@ -1,6 +1,8 @@
+import type { Polygon } from "./types/geometry";
+
 let overlay: SVGPolygonElement | null = null;
 
-export function renderDebugOverlay(polygon: { x: number; y: number }[]) {
+export function renderDebugOverlay(polygon: Polygon) {
     removeDebugOverlay();
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -17,7 +19,7 @@ export function renderDebugOverlay(polygon: { x: number; y: number }[]) {
     overlay.setAttribute('stroke', 'red');
     overlay.setAttribute('stroke-width', '1');
 
-    const points = polygon.map(p => `${p.x},${p.y}`).join(' ');
+    const points = polygon.map(p => `${p.left},${p.top}`).join(' ');
     overlay.setAttribute('points', points);
 
     svg.appendChild(overlay);
