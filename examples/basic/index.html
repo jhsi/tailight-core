@@ -7,75 +7,133 @@
     <title>Trailwind Core - Basic Example</title>
     <style>
         body {
+            --box-size: 128px;
             font-family: system-ui, -apple-system, sans-serif;
-            padding: 2rem;
+            padding: 2rem 4rem;
+            background: oklch(13% 0.028 261.692);
+            color: #fafafa;
+            max-width: 480px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        h1 {
+            font-weight: 400;
+            font-size: 8rem;
+            text-shadow: 0 8px 12px #000;
+            margin-bottom: 1rem;
         }
 
         .container {
             display: flex;
             gap: 2rem;
-            margin: 2rem 0;
-            gap: 1rem;
+            margin: 6rem 1rem;
         }
 
         .space-between {
             justify-content: space-between;
         }
 
-        .box {
-            --box-size: 100px;
+        .button {
             width: var(--box-size);
-            height: calc(var(--box-size) / 1.619);
-            background: #e2e8f0;
-            border: 2px solid #94a3b8;
+            height: calc(var(--box-size) / 3);
+            background: oklch(42.4% 0.199 265.638);
+            border: 1px solid oklch(37.9% 0.146 265.522);
             border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
+            transition: all 0.12s;
+            cursor: pointer;
+            background-color: #FFFFFF;
+            border: 0;
+            border-radius: .5rem;
+            box-sizing: border-box;
+            color: #111827;
+            font-weight: 600;
+            line-height: 1.25rem;
+            padding: .75rem 1rem;
+            text-align: center;
+            text-decoration: none #D1D5DB solid;
+            text-decoration-thickness: auto;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
         }
 
-        .box:hover {
-            background: #cbd5e1;
+        .button:hover {
+            background-color: rgb(249, 250, 251);
+        }
+
+        .button:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+        }
+
+        .button:focus-visible {
+            box-shadow: none;
         }
 
         .status {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: #f1f5f9;
-            border-radius: 4px;
+            /* margin-top: 1rem; */
+            /* padding: 1rem; */
+            /* background: oklch(20.5% 0 0); */
+            /* border-radius: 4px; */
             transition: background-color 0.2s;
+            font-size: 1.15rem;
+            font-weight: 400;
+            color: oklch(55.1% 0.027 264.364);
         }
 
         .status[data-active="true"] {
-            background: #dcfce7;
+            /* background: oklch(92.5% 0.084 155.995); */
+            /* color: oklch(43.2% 0.095 166.913); */
+        }
+
+        .destination-container {
+            position: relative;
+        }
+
+        .destination {
+            --destination-inline-size: calc(var(--box-size) * 1.619);
+            --destination-block-size: calc(var(--box-size));
+            opacity: 0.25;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+            cursor: grab;
+            position: absolute;
+            width: var(--destination-inline-size);
+            height: var(--destination-block-size);
+            transform: translate(-100%, 0%);
+            background: oklch(20.5% 0 0);
+            border: 1px solid oklch(37.1% 0 0);
+            border-radius: 0;
         }
 
         /* Styles for the destination when the desire path is active */
         .destination:hover,
         .destination[data-active="true"] {
-            opacity: 1;
-        }
-
-        .destination {
-            opacity: 0.2;
-            transition: opacity 0.2s;
-            width: calc(var(--box-size) * 2 * 1.619);
-            height: calc(var(--box-size) * 2);
+            opacity: .9;
+            box-shadow: 0 0 24px oklch(20.5% 0 0);
+            border: 1px solid oklch(37.1% 0 0);
+            background: oklch(20.5% 0 0);
         }
     </style>
 </head>
 
 <body>
-    <h1>Trailwind Core - Basic Example</h1>
-    <p>Move your mouse between the boxes to see the desire path in action.</p>
-
-    <div class="container space-between">
-        <div id="source" class="box">Hover me</div>
-        <div id="destination" class="box destination" data-active="false">Home sweet home</div>
+    <h1>Trailwind</h1>
+    <div id="status" class="status" data-active="false">A library to create desire paths for UI hover states
     </div>
 
-    <div id="status" class="status" data-active="false">Move your mouse between the boxes...</div>
+    <div class="container space-between">
+        <button id="source" class="button">Hover here</button>
+        <div class="destination-container">
+            <div id="destination" class="destination" data-active="false">Drag to move</div>
+        </div>
+    </div>
+    </div>
 
     <script type="module">
         import { createDesirePath } from '@trailwind-core';
@@ -83,6 +141,7 @@
         const source = document.getElementById('source');
         const destination = document.getElementById('destination');
         const status = document.getElementById('status');
+        const DEBUG = false;
 
         let desirePath = null;
         let isInDesirePath = false;
@@ -93,13 +152,12 @@
                 src: source,
                 dest: destination,
                 onPathEnter: () => {
-                    status.textContent = 'Mouse is in the desire path!';
                     status.dataset.active = 'true';
                     destination.dataset.active = 'true';
                 },
                 onPathLeave: () => {
+                    if (!isInDesirePath) return;
                     isInDesirePath = false;
-                    status.textContent = 'Move your mouse between the boxes...';
                     status.dataset.active = 'false';
                     destination.dataset.active = 'false';
                     desirePath?.destroy();
@@ -109,6 +167,46 @@
                 debug: true // Enable debug mode to see the polygon
             });
         });
+
+        // add click handlers to destination so it can be dragged & moved
+        let isDragging = false;
+        let startX, startY;
+        let initialLeft, initialTop;
+
+        destination.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            isDragging = true;
+            destination.style.cursor = 'grabbing';
+
+            // Get initial positions
+            startX = e.clientX;
+            startY = e.clientY;
+
+            // Get current transform values
+            const transform = new WebKitCSSMatrix(getComputedStyle(destination).transform);
+            initialLeft = transform.m41; // current X translation
+            initialTop = transform.m42;  // current Y translation
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            e.stopPropagation();
+
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+
+            // Use transform consistently
+            destination.style.transform = `translate(calc(${initialLeft + deltaX}px), calc(${initialTop + deltaY}px))`;
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            destination.style.cursor = 'grab';
+        });
+
     </script>
 </body>
 
