@@ -1,18 +1,12 @@
 import { getIntentPolygon, pointInPolygon } from './geometry';
 import { renderDebugOverlay, removeDebugOverlay } from './debug';
+import type { TrailwindConfig } from './types/core';
 
-export function internalCreateDesirePath(config: {
-    from: HTMLElement;
-    to: HTMLElement;
-    onPathEnter?: () => void;
-    onPathLeave?: () => void;
-    tolerance?: number;
-    debug?: boolean;
-}) {
+export function internalCreateDesirePath(config: TrailwindConfig) {
     let isInside = false;
 
     const updatePolygon = () =>
-        getIntentPolygon(config.from, config.to, config.tolerance || 12);
+        getIntentPolygon(config.src, config.dest, config.tolerance || 0);
 
     let polygon = updatePolygon();
 
@@ -38,8 +32,8 @@ export function internalCreateDesirePath(config: {
         if (config.debug) renderDebugOverlay(polygon);
     });
 
-    observer.observe(config.from);
-    observer.observe(config.to);
+    observer.observe(config.src);
+    observer.observe(config.dest);
 
     return {
         destroy() {
