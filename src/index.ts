@@ -1,3 +1,5 @@
+import { internalCreateDesirePath } from "./core";
+
 // Core logic for desire path
 export interface TrailwindConfig {
     from: HTMLElement;
@@ -9,6 +11,5 @@ export interface TrailwindConfig {
 }
 
 export function createDesirePath(config: TrailwindConfig) {
-    // Core logic goes here
-    console.log("Creating trailwind path between", config.from, "and", config.to);
+    return internalCreateDesirePath(config);
 }
