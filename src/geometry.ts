@@ -7,7 +7,7 @@ type Box = {
     bottom: number;
 };
 
-function getBoxFromElement(element: HTMLElement): Box {
+export function getBoxFromElement(element: Element): Box {
     const rect = element.getBoundingClientRect();
     return {
         left: rect.left,
