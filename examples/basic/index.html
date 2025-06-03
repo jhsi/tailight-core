@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trailwind Core - Basic Example</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 2rem;
+        }
+
+        .container {
+            display: flex;
+            gap: 2rem;
+            margin: 2rem 0;
+            gap: 1rem;
+        }
+
+        .space-between {
+            justify-content: space-between;
+        }
+
+        .box {
+            --box-size: 100px;
+            width: var(--box-size);
+            height: calc(var(--box-size) / 1.619);
+            background: #e2e8f0;
+            border: 2px solid #94a3b8;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .box:hover {
+            background: #cbd5e1;
+        }
+
+        .status {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f1f5f9;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .status[data-active="true"] {
+            background: #dcfce7;
+        }
+
+        /* Styles for the destination when the desire path is active */
+        .destination:hover,
+        .destination[data-active="true"] {
+            opacity: 1;
+        }
+
+        .destination {
+            opacity: 0.2;
+            transition: opacity 0.2s;
+            width: calc(var(--box-size) * 2 * 1.619);
+            height: calc(var(--box-size) * 2);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Trailwind Core - Basic Example</h1>
+    <p>Move your mouse between the boxes to see the desire path in action.</p>
+
+    <div class="container space-between">
+        <div id="source" class="box">Hover me</div>
+        <div id="destination" class="box destination" data-active="false">Home sweet home</div>
+    </div>
+
+    <div id="status" class="status" data-active="false">Move your mouse between the boxes...</div>
+
+    <script type="module">
+        import { createDesirePath } from '@trailwind-core';
+
+        const source = document.getElementById('source');
+        const destination = document.getElementById('destination');
+        const status = document.getElementById('status');
+
+        let desirePath = null;
+        let isInDesirePath = false;
+
+        source.addEventListener('mouseenter', () => {
+            isInDesirePath = true;
+            desirePath = createDesirePath({
+                src: source,
+                dest: destination,
+                onPathEnter: () => {
+                    status.textContent = 'Mouse is in the desire path!';
+                    status.dataset.active = 'true';
+                    destination.dataset.active = 'true';
+                },
+                onPathLeave: () => {
+                    isInDesirePath = false;
+                    status.textContent = 'Move your mouse between the boxes...';
+                    status.dataset.active = 'false';
+                    destination.dataset.active = 'false';
+                    desirePath?.destroy();
+                    desirePath = null;
+                },
+                tolerance: 0,
+                debug: true // Enable debug mode to see the polygon
+            });
+        });
+    </script>
+</body>
+
+</html>

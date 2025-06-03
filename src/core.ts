@@ -3,7 +3,7 @@ import { renderDebugOverlay, removeDebugOverlay } from './debug';
 import type { TrailwindConfig } from './types/core';
 import { throttle } from './utils/throttle';
 
-const THROTTLE_DELAY_MS = 100; // 60fps
+const THROTTLE_DELAY_MS = 50; // 60+fps
 
 export function internalCreateDesirePath(config: TrailwindConfig) {
     let isInside = false;
@@ -16,7 +16,6 @@ export function internalCreateDesirePath(config: TrailwindConfig) {
     function onMouseMove(e: MouseEvent) {
         const point = { left: e.clientX, top: e.clientY };
         const inside = pointInPolygon(point, polygon);
-
         if (inside && !isInside) {
             isInside = true;
             config.onPathEnter?.();
@@ -26,23 +25,24 @@ export function internalCreateDesirePath(config: TrailwindConfig) {
         }
     }
 
-    window.addEventListener('mousemove', throttle(onMouseMove, THROTTLE_DELAY_MS));
-
     if (config.debug) renderDebugOverlay(polygon);
 
-    const observer = new ResizeObserver(
-        throttle(() => {
-            polygon = updatePolygon();
-            if (config.debug) renderDebugOverlay(polygon);
-        }, THROTTLE_DELAY_MS)
-    );
+    const throttledUpdate = throttle(() => {
+        polygon = updatePolygon();
+        if (config.debug) renderDebugOverlay(polygon);
+    }, THROTTLE_DELAY_MS);
 
+    const observer = new ResizeObserver(throttledUpdate);
     observer.observe(config.src);
     observer.observe(config.dest);
+
+    window.addEventListener('mousemove', throttle(onMouseMove, THROTTLE_DELAY_MS));
+    window.addEventListener('resize', throttledUpdate);
 
     return {
         destroy() {
             window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('resize', throttledUpdate);
             observer.disconnect();
             if (config.debug) removeDebugOverlay();
         },
