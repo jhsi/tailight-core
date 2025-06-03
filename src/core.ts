@@ -1,6 +1,9 @@
 import { getIntentPolygon, pointInPolygon } from './geometry';
 import { renderDebugOverlay, removeDebugOverlay } from './debug';
 import type { TrailwindConfig } from './types/core';
+import { throttle } from './utils/throttle';
+
+const THROTTLE_DELAY_MS = 100; // 60fps
 
 export function internalCreateDesirePath(config: TrailwindConfig) {
     let isInside = false;
@@ -23,14 +26,16 @@ export function internalCreateDesirePath(config: TrailwindConfig) {
         }
     }
 
-    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mousemove', throttle(onMouseMove, THROTTLE_DELAY_MS));
 
     if (config.debug) renderDebugOverlay(polygon);
 
-    const observer = new ResizeObserver(() => {
-        polygon = updatePolygon();
-        if (config.debug) renderDebugOverlay(polygon);
-    });
+    const observer = new ResizeObserver(
+        throttle(() => {
+            polygon = updatePolygon();
+            if (config.debug) renderDebugOverlay(polygon);
+        }, THROTTLE_DELAY_MS)
+    );
 
     observer.observe(config.src);
     observer.observe(config.dest);
