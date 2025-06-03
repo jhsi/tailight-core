@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getIntentPolygon, pointInPolygon } from '../geometry';
+import { getIntentPolygon, isValidPolygon, pointInPolygon } from '../geometry';
 import type { Point, Polygon } from '../types/geometry';
 
 describe('getIntentPolygon', () => {
@@ -35,24 +35,13 @@ describe('getIntentPolygon', () => {
         });
     };
 
-    // Helper function to validate polygon ordering
-    const validatePolygonOrdering = (polygon: Polygon) => {
-        // Check if points are ordered clockwise
-        const [topLeft, topRight, bottomRight, bottomLeft] = polygon;
-        const topLeftValid = topLeft.left < topRight.left && topLeft.top < bottomRight.top && topLeft.top < bottomLeft.top;
-        const topRightValid = topRight.top < bottomRight.top && topRight.top < bottomLeft.top;
-        const bottomLeftValid = bottomLeft.left < bottomRight.left;
-
-        return topLeftValid && topRightValid && bottomLeftValid;
-    };
-
     it('should create intent polygon when src is to the left of dest', () => {
         const src = createMockElement(0, 0, 100, 100);
         const dest = createMockElement(150, 0, 100, 100);
         const tolerance = 10;
 
         const polygon = getIntentPolygon(src, dest, tolerance);
-        expect(validatePolygonOrdering(polygon)).toBe(true);
+        expect(isValidPolygon(polygon)).toBe(true);
 
         verifyPolygonPoints(polygon, [
             { left: 0, top: -10 },      // top left (farthest src)
@@ -68,7 +57,7 @@ describe('getIntentPolygon', () => {
         const tolerance = 10;
 
         const polygon = getIntentPolygon(src, dest, tolerance);
-        expect(validatePolygonOrdering(polygon)).toBe(true);
+        expect(isValidPolygon(polygon)).toBe(true);
 
         verifyPolygonPoints(polygon, [
             { left: 100, top: -10 },    // top left (closest dest)
@@ -84,7 +73,7 @@ describe('getIntentPolygon', () => {
         const tolerance = 10;
 
         const polygon = getIntentPolygon(src, dest, tolerance);
-        expect(validatePolygonOrdering(polygon)).toBe(true);
+        expect(isValidPolygon(polygon)).toBe(true);
 
         verifyPolygonPoints(polygon, [
             { left: -10, top: 0 },      // top left (farthest src)
@@ -100,7 +89,7 @@ describe('getIntentPolygon', () => {
         const tolerance = 10;
 
         const polygon = getIntentPolygon(src, dest, tolerance);
-        expect(validatePolygonOrdering(polygon)).toBe(true);
+        expect(isValidPolygon(polygon)).toBe(true);
 
         verifyPolygonPoints(polygon, [
             { left: -10, top: 100 },    // top left (closest dest)
@@ -116,7 +105,7 @@ describe('getIntentPolygon', () => {
         const tolerance = 10;
 
         const polygon = getIntentPolygon(src, dest, tolerance);
-        expect(validatePolygonOrdering(polygon)).toBe(true);
+        expect(isValidPolygon(polygon)).toBe(true);
 
         verifyPolygonPoints(polygon, [
             { left: 0, top: -10 },      // top left (farthest src)
@@ -126,35 +115,23 @@ describe('getIntentPolygon', () => {
         ]);
     });
 
-    it('should handle diagonal arrangement', () => {
+    it('should handle diagonal arrangement | when dest is in quadrant II', () => {
         const src = createMockElement(0, 0, 100, 100);
         const dest = createMockElement(150, 150, 100, 100);
-        const tolerance = 10;
+        const tolerance = 0;
 
         const polygon = getIntentPolygon(src, dest, tolerance);
-        expect(validatePolygonOrdering(polygon)).toBe(true);
+        expect(isValidPolygon(polygon)).toBe(true);
 
         // For diagonal arrangement, we expect the polygon to connect
-        // the two farthest corners of src to the two closest corners of dest
-        expect(polygon).toHaveLength(4);
-
-        // Verify that the first two points are from src's farthest corners
-        const srcPoints = polygon.slice(0, 2);
-        srcPoints.forEach(point => {
-            expect(
-                (point.left === 0 || point.left === 100) &&
-                (point.top === 0 || point.top === 100)
-            ).toBe(true);
-        });
-
-        // Verify that the last two points are from dest's closest corners
-        const destPoints = polygon.slice(2);
-        destPoints.forEach(point => {
-            expect(
-                (point.left === 150 || point.left === 250) &&
-                (point.top === 150 || point.top === 250)
-            ).toBe(true);
-        });
+        // the top left of src to the top right of dest
+        // the bottom right of src to the bottom left of dest
+        verifyPolygonPoints(polygon, [
+            { left: 0, top: 100 },
+            { left: 100, top: 0 },
+            { left: 250, top: 150 },
+            { left: 150, top: 250 },
+        ]);
     });
 });
 
@@ -179,5 +156,29 @@ describe('pointInPolygon', () => {
         ];
 
         expect(pointInPolygon({ left: 150, top: 150 }, polygon)).toBe(false);
+    });
+});
+
+
+describe('isValidPolygon', () => {
+    it('should return true for valid polygon', () => {
+        const polygon: Polygon = [
+            { left: 0, top: 0 },
+            { left: 100, top: 0 },
+            { left: 100, top: 100 },
+            { left: 0, top: 100 }
+        ];
+
+        expect(isValidPolygon(polygon)).toBe(true);
+    });
+    it('should return false for invalid polygon', () => {
+        const polygon: Polygon = [
+            { left: 0, top: 0 },
+            { left: 100, top: 100 },
+            { left: 0, top: 100 },
+            { left: 100, top: 0 }
+        ];
+
+        expect(isValidPolygon(polygon)).toBe(false);
     });
 });
