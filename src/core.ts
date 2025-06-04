@@ -25,11 +25,11 @@ export function internalCreateDesirePath(config: TrailwindConfig) {
         }
     }
 
-    if (config.debug) renderDebugOverlay(polygon);
+    if (config.debug) renderDebugOverlay(polygon, config.options?.debugOverlayCSSAttributes);
 
     const throttledUpdate = throttle(() => {
         polygon = updatePolygon();
-        if (config.debug) renderDebugOverlay(polygon);
+        if (config.debug) renderDebugOverlay(polygon, config.options?.debugOverlayCSSAttributes);
     }, THROTTLE_DELAY_MS);
 
     const observer = new ResizeObserver(throttledUpdate);

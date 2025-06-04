@@ -5,4 +5,7 @@ export interface TrailwindConfig {
     onPathLeave?: () => void;
     tolerance?: number;
     debug?: boolean;
+    options?: {
+        debugOverlayCSSAttributes?: Record<string, string>;
+    };
 }

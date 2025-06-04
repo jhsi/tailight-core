@@ -2,7 +2,7 @@ import type { Polygon } from "./types/geometry";
 
 let overlay: SVGPolygonElement | null = null;
 
-export function renderDebugOverlay(polygon: Polygon) {
+export function renderDebugOverlay(polygon: Polygon, cssAttributes: Record<string, string> = {}) {
     removeDebugOverlay();
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -18,6 +18,9 @@ export function renderDebugOverlay(polygon: Polygon) {
     overlay.setAttribute('fill', 'rgba(255,0,0,0.2)');
     overlay.setAttribute('stroke', 'red');
     overlay.setAttribute('stroke-width', '1');
+    Object.entries(cssAttributes).forEach(([key, value]) => {
+        overlay?.setAttribute(key, value);
+    });
 
     const points = polygon.map(p => `${p.left},${p.top}`).join(' ');
     overlay.setAttribute('points', points);
