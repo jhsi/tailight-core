@@ -128,9 +128,9 @@
     </div>
 
     <div class="container space-between">
-        <button id="source" class="button">Hover here</button>
+        <button id="source" class="button">here</button>
         <div class="destination-container">
-            <div id="destination" class="destination" data-active="false">Drag to move</div>
+            <div id="destination" class="destination" data-active="false">there</div>
         </div>
     </div>
     </div>
@@ -146,9 +146,8 @@
         let desirePath = null;
         let isInDesirePath = false;
 
-        source.addEventListener('mouseenter', () => {
-            isInDesirePath = true;
-            desirePath = createDesirePath({
+        function createDemoDesirePath() {
+            return createDesirePath({
                 src: source,
                 dest: destination,
                 onPathEnter: () => {
@@ -157,11 +156,11 @@
                 },
                 onPathLeave: () => {
                     if (!isInDesirePath) return;
-                    isInDesirePath = false;
-                    status.dataset.active = 'false';
-                    destination.dataset.active = 'false';
-                    desirePath?.destroy();
-                    desirePath = null;
+                    // isInDesirePath = false;
+                    // status.dataset.active = 'false';
+                    // destination.dataset.active = 'false';
+                    // desirePath?.destroy();
+                    // desirePath = null;
                 },
                 tolerance: 0,
                 options: {
@@ -175,6 +174,10 @@
                 },
                 debug: true // Enable debug mode to see the polygon
             });
+        }
+        source.addEventListener('mouseenter', () => {
+            isInDesirePath = true;
+            desirePath = createDemoDesirePath();
         });
 
         // add click handlers to destination so it can be dragged & moved
@@ -208,6 +211,7 @@
 
             // Use transform consistently
             destination.style.transform = `translate(calc(${initialLeft + deltaX}px), calc(${initialTop + deltaY}px))`;
+            desirePath = createDemoDesirePath();
         });
 
         document.addEventListener('mouseup', (e) => {
