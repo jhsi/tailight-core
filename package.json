@@ -15,5 +15,8 @@
     "typescript": "^5.0.0",
     "vite": "^5.0.0",
     "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "martinez-polygon-clipping": "^0.7.4"
   }
 }

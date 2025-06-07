@@ -9,7 +9,7 @@ export function internalCreateDesirePath(config: TrailwindConfig) {
     let isInside = false;
 
     const updatePolygon = () =>
-        getIntentPolygon(config.src, config.dest, config.tolerance || 0);
+        getIntentPolygon(config.src, config.dest);
 
     let polygon = updatePolygon();
 
