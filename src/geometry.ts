@@ -1,4 +1,4 @@
-import type { Point, Polygon } from './types/geometry';
+import { BOX_BOTTOM_LEFT, BOX_BOTTOM_RIGHT, BOX_TOP_LEFT, BOX_TOP_RIGHT, type Point, type Polygon } from './types/geometry';
 import * as martinez from 'martinez-polygon-clipping';
 // Add import for martinez-polygon-clipping if available
 // import martinez from 'martinez-polygon-clipping';
@@ -76,11 +76,33 @@ function subtract(subject: Point[], clips: Point[][]): Point[] {
 }
 
 // Generalized: connect two polygons (not just boxes)
-export function getIntentPolygonBetweenPolygons(srcPoly: Point[], destPoly: Point[]): Point[] {
-    // 1. Combine all points
-    const allPoints = [...srcPoly, ...destPoly];
-    // 2. Angle sort or convex hull
-    return angleSortedPoints(allPoints);
+export function getIntentPolygonBetweenPolygons(src: Polygon, dest: Polygon): Point[] {
+    const srcWidth = src[BOX_TOP_RIGHT].left - src[BOX_TOP_LEFT].left;
+    const srcHeight = src[BOX_BOTTOM_LEFT].top - src[BOX_TOP_LEFT].top;
+    const destWidth = dest[BOX_TOP_RIGHT].left - dest[BOX_TOP_LEFT].left;
+    const destHeight = dest[BOX_BOTTOM_LEFT].top - dest[BOX_TOP_LEFT].top;
+
+    const destIsQuadrantI = src[BOX_TOP_LEFT].left < dest[BOX_TOP_LEFT].left && src[BOX_TOP_LEFT].top > dest[BOX_TOP_LEFT].top;
+    const destIsQuadrantII = src[BOX_TOP_RIGHT].left > dest[BOX_TOP_RIGHT].left && src[BOX_TOP_RIGHT].top > dest[BOX_TOP_RIGHT].top;
+    const destIsQuadrantIII = src[BOX_BOTTOM_RIGHT].left > dest[BOX_BOTTOM_RIGHT].left && src[BOX_BOTTOM_RIGHT].top < dest[BOX_BOTTOM_RIGHT].top;
+    const destIsQuadrantIV = src[BOX_BOTTOM_LEFT].left < dest[BOX_BOTTOM_LEFT].left && src[BOX_BOTTOM_LEFT].top < dest[BOX_BOTTOM_LEFT].top;
+    let result: Point[] = [];
+
+    if (destIsQuadrantI) {
+        const path = [src[BOX_TOP_LEFT], src[BOX_BOTTOM_RIGHT], src[BOX_TOP_RIGHT], dest[BOX_TOP_LEFT], dest[BOX_BOTTOM_RIGHT], dest[BOX_BOTTOM_LEFT]];
+        result = path;
+    } else if (destIsQuadrantII) {
+        const path = [src[BOX_TOP_LEFT], src[BOX_TOP_RIGHT], src[BOX_BOTTOM_LEFT], dest[BOX_BOTTOM_LEFT], dest[BOX_BOTTOM_RIGHT], dest[BOX_TOP_RIGHT]];
+        result = path;
+    } else if (destIsQuadrantIII) {
+        const path = [src[BOX_TOP_LEFT], src[BOX_BOTTOM_RIGHT], src[BOX_BOTTOM_LEFT], dest[BOX_TOP_LEFT], dest[BOX_TOP_RIGHT], dest[BOX_BOTTOM_RIGHT]];
+        result = path;
+    } else if (destIsQuadrantIV) {
+        const path = [src[BOX_BOTTOM_LEFT], src[BOX_BOTTOM_RIGHT], src[BOX_TOP_RIGHT], dest[BOX_TOP_LEFT], dest[BOX_TOP_RIGHT], dest[BOX_BOTTOM_LEFT]];
+        result = path;
+    }
+
+    return angleSortedPoints(result);
 }
 
 // Accepts two polygons (Point[]), not just boxes or elements
