@@ -1,5 +1,6 @@
 import { BOX_BOTTOM_LEFT, BOX_BOTTOM_RIGHT, BOX_TOP_LEFT, BOX_TOP_RIGHT, type Point, type Polygon } from './types/geometry';
 import * as martinez from 'martinez-polygon-clipping';
+import { throttle } from './utils/throttle';
 // Add import for martinez-polygon-clipping if available
 // import martinez from 'martinez-polygon-clipping';
 
@@ -77,30 +78,56 @@ function subtract(subject: Point[], clips: Point[][]): Point[] {
 
 // Generalized: connect two polygons (not just boxes)
 export function getIntentPolygonBetweenPolygons(src: Polygon, dest: Polygon): Point[] {
-    const srcWidth = src[BOX_TOP_RIGHT].left - src[BOX_TOP_LEFT].left;
-    const srcHeight = src[BOX_BOTTOM_LEFT].top - src[BOX_TOP_LEFT].top;
-    const destWidth = dest[BOX_TOP_RIGHT].left - dest[BOX_TOP_LEFT].left;
-    const destHeight = dest[BOX_BOTTOM_LEFT].top - dest[BOX_TOP_LEFT].top;
-
-    const destIsQuadrantI = src[BOX_TOP_LEFT].left < dest[BOX_TOP_LEFT].left && src[BOX_TOP_LEFT].top > dest[BOX_TOP_LEFT].top;
-    const destIsQuadrantII = src[BOX_TOP_RIGHT].left > dest[BOX_TOP_RIGHT].left && src[BOX_TOP_RIGHT].top > dest[BOX_TOP_RIGHT].top;
-    const destIsQuadrantIII = src[BOX_BOTTOM_RIGHT].left > dest[BOX_BOTTOM_RIGHT].left && src[BOX_BOTTOM_RIGHT].top < dest[BOX_BOTTOM_RIGHT].top;
-    const destIsQuadrantIV = src[BOX_BOTTOM_LEFT].left < dest[BOX_BOTTOM_LEFT].left && src[BOX_BOTTOM_LEFT].top < dest[BOX_BOTTOM_LEFT].top;
     let result: Point[] = [];
 
-    if (destIsQuadrantI) {
+    // upper or lower quadrants relative to src
+    const destQIorQII = dest[BOX_TOP_LEFT].top <= src[BOX_TOP_LEFT].top && dest[BOX_TOP_RIGHT].top <= src[BOX_TOP_RIGHT].top;
+    const destQIIIorQIV = dest[BOX_BOTTOM_LEFT].top >= src[BOX_BOTTOM_LEFT].top && dest[BOX_BOTTOM_RIGHT].top >= src[BOX_BOTTOM_RIGHT].top;
+    // left or right quadrants relative to src
+    const destQIIorQIII = dest[BOX_TOP_LEFT].left <= src[BOX_TOP_LEFT].left && dest[BOX_BOTTOM_LEFT].left <= src[BOX_BOTTOM_LEFT].left;
+    const destQIorQIV = dest[BOX_TOP_RIGHT].left >= src[BOX_TOP_RIGHT].left && dest[BOX_BOTTOM_RIGHT].left >= src[BOX_BOTTOM_RIGHT].left;
+
+    // upper right quadrant
+    const destQI = destQIorQII && destQIorQIV;
+    // upper left quadrant
+    const destQII = destQIorQII && destQIIorQIII;
+    // lower right quadrant
+    const destQIII = destQIIorQIII && destQIIIorQIV;
+    // lower left quadrant
+    const destQIV = destQIIIorQIV && destQIorQIV;
+
+    const betweenQIandQII = destQI && destQII;
+    const betweenQIIandQIII = destQII && destQIII;
+    const betweenQIIIandQIV = destQIII && destQIV;
+    const betweenQIandQIV = destQI && destQIV;
+
+    if (betweenQIandQII) {
+        result = [src[BOX_BOTTOM_LEFT], src[BOX_BOTTOM_RIGHT], dest[BOX_BOTTOM_LEFT], dest[BOX_BOTTOM_RIGHT]];
+    } else if (betweenQIIandQIII) {
+        result = [src[BOX_TOP_RIGHT], src[BOX_BOTTOM_LEFT], dest[BOX_TOP_RIGHT], dest[BOX_BOTTOM_LEFT]];
+    } else if (betweenQIIIandQIV) {
+        result = [src[BOX_TOP_LEFT], src[BOX_TOP_RIGHT], dest[BOX_TOP_LEFT], dest[BOX_TOP_RIGHT]];
+    } else if (betweenQIandQIV) {
+        result = [src[BOX_TOP_LEFT], src[BOX_BOTTOM_LEFT], dest[BOX_TOP_LEFT], dest[BOX_BOTTOM_LEFT]];
+    } else if (destQI) {
         const path = [src[BOX_TOP_LEFT], src[BOX_BOTTOM_RIGHT], src[BOX_TOP_RIGHT], dest[BOX_TOP_LEFT], dest[BOX_BOTTOM_RIGHT], dest[BOX_BOTTOM_LEFT]];
         result = path;
-    } else if (destIsQuadrantII) {
+    } else if (destQII) {
         const path = [src[BOX_TOP_LEFT], src[BOX_TOP_RIGHT], src[BOX_BOTTOM_LEFT], dest[BOX_BOTTOM_LEFT], dest[BOX_BOTTOM_RIGHT], dest[BOX_TOP_RIGHT]];
         result = path;
-    } else if (destIsQuadrantIII) {
+    } else if (destQIII) {
         const path = [src[BOX_TOP_LEFT], src[BOX_BOTTOM_RIGHT], src[BOX_BOTTOM_LEFT], dest[BOX_TOP_LEFT], dest[BOX_TOP_RIGHT], dest[BOX_BOTTOM_RIGHT]];
         result = path;
-    } else if (destIsQuadrantIV) {
+    } else if (destQIV) {
         const path = [src[BOX_BOTTOM_LEFT], src[BOX_BOTTOM_RIGHT], src[BOX_TOP_RIGHT], dest[BOX_TOP_LEFT], dest[BOX_TOP_RIGHT], dest[BOX_BOTTOM_LEFT]];
         result = path;
     }
+
+    throttle(() => {
+        setTimeout(() => {
+            console.log('> quadrant:', [destQI, destQII, destQIII, destQIV]);
+        }, 1);
+    }, 1000)();
 
     return angleSortedPoints(result);
 }
