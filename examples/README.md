@@ -1,6 +1,6 @@
 # Trailwind Core Examples
 
-This directory contains examples demonstrating how to use the Trailwind Core library.
+This directory contains an example (titled Tailight) demonstrating how to use the Trailwind Core library.
 
 ## Running the Examples
 
@@ -35,10 +35,3 @@ Located in `basic/index.html`, this example demonstrates:
 - Creating a desire path between two elements
 - Using the `onPathEnter` and `onPathLeave` callbacks
 - Enabling debug mode to visualize the polygon
-- Setting a custom tolerance value
-
-## More Examples Coming Soon
-- Advanced usage examples
-- Custom polygon visualization
-- Dynamic element positioning
-- Multiple desire paths 
