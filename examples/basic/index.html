@@ -152,14 +152,13 @@
                 onPathEnter: () => {
                     status.dataset.active = 'true';
                     destination.dataset.active = 'true';
+                    console.log('onPathEnter');
                 },
                 onPathLeave: () => {
-                    if (!isInDesirePath) return;
-                    isInDesirePath = false;
                     status.dataset.active = 'false';
                     destination.dataset.active = 'false';
                     desirePath?.destroy();
-                    desirePath = null;
+                    console.log('onPathLeave');
                 },
                 tolerance: 0,
                 options: {
@@ -174,15 +173,15 @@
                 debug: true // Enable debug mode to see the polygon
             });
         }
-        source.addEventListener('mouseenter', () => {
-            isInDesirePath = true;
-            desirePath = createDemoDesirePath();
-        });
 
         // add click handlers to destination so it can be dragged & moved
         let isDragging = false;
         let startX, startY;
         let initialLeft, initialTop;
+
+        source.addEventListener('mouseenter', () => {
+            desirePath = createDemoDesirePath();
+        });
 
         destination.addEventListener('mousedown', (e) => {
             e.preventDefault();

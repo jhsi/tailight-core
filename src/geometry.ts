@@ -129,25 +129,3 @@ export function getIntentPolygons(src: Element, dest: Element, options?: Trailwi
     }
     return result;
 }
-
-// If you want to support Elements or Boxes, use boxToPolygon first:
-// getIntentPolygon(boxToPolygon(srcBox), boxToPolygon(destBox));
-// or
-// getIntentPolygon(boxToPolygon(getBoxFromElement(srcElem)), boxToPolygon(getBoxFromElement(destElem)));
-
-// Ray-casting algorithm for point-in-polygon
-export function pointInPolygon(
-    point: Point,
-    vs: Point[]
-): boolean {
-    let inside = false;
-    for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-        const xi = vs[i].left, yi = vs[i].top;
-        const xj = vs[j].left, yj = vs[j].top;
-
-        const intersect = yi > point.top !== yj > point.top &&
-            point.left < ((xj - xi) * (point.top - yi)) / (yj - yi) + xi;
-        if (intersect) inside = !inside;
-    }
-    return inside;
-}
