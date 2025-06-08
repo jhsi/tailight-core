@@ -152,13 +152,11 @@
                 onPathMouseEnter: () => {
                     status.dataset.active = 'true';
                     destination.dataset.active = 'true';
-                    console.log('onPathEnter');
                 },
                 onPathMouseLeave: () => {
                     status.dataset.active = 'false';
                     destination.dataset.active = 'false';
                     desirePath?.destroy();
-                    console.log('onPathLeave');
                 },
                 tolerance: 0,
                 options: {

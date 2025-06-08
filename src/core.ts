@@ -1,26 +1,47 @@
-import { getIntentPolygons } from './geometry';
+import { boxToPolygon, getBoxFromElement, getIntentPolygons, pointInPolygon } from './geometry';
 import { renderOverlay, removeAllOverlays, OverlayEvents } from './overlay';
 import type { TrailwindConfig } from './types/core';
 import { throttle } from './utils/throttle';
 
 const THROTTLE_DELAY_MS = 50; // 60+fps
 
+function propagateToUnderlying(e: MouseEvent, config: TrailwindConfig, type: string) {
+    const point = { left: e.clientX, top: e.clientY };
+    const isInDestination = pointInPolygon(point, boxToPolygon(getBoxFromElement(config.dest)));
+    const isInSource = pointInPolygon(point, boxToPolygon(getBoxFromElement(config.src)));
+    if (isInDestination && config.options?.include?.dest) {
+        config.dest.dispatchEvent(new MouseEvent(type, e));
+    } else if (isInSource && config.options?.include?.src) {
+        config.src.dispatchEvent(new MouseEvent(type, e));
+    }
+}
+
 export function _createDesirePath(config: TrailwindConfig) {
     const updatePolygons = () => getIntentPolygons(config.src, config.dest, config.options);
     let polygons = updatePolygons();
 
     const mouseEvents: OverlayEvents = {
-        onClick: () => {
-            config.onPathClick?.();
+        onClick: (e: MouseEvent) => {
+            config.onPathClick?.(e);
+            propagateToUnderlying(e, config, 'click');
         },
-        onMouseEnter: () => {
-            config.onPathMouseEnter?.();
+        onMouseDown: (e: MouseEvent) => {
+            config.onPathMouseDown?.(e);
+            propagateToUnderlying(e, config, 'mousedown');
         },
-        onMouseLeave: () => {
-            config.onPathMouseLeave?.();
+        onMouseUp: (e: MouseEvent) => {
+            config.onPathMouseUp?.(e);
+            propagateToUnderlying(e, config, 'mouseup');
         },
-        onMouseMove: () => {
-            config.onPathMouseMove?.();
+        onMouseMove: (e: MouseEvent) => {
+            config.onPathMouseMove?.(e);
+            propagateToUnderlying(e, config, 'mousemove');
+        },
+        onMouseEnter: (e: MouseEvent) => {
+            config.onPathMouseEnter?.(e);
+        },
+        onMouseLeave: (e: MouseEvent) => {
+            config.onPathMouseLeave?.(e);
         },
     };
 

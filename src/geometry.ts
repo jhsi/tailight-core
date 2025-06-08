@@ -56,7 +56,7 @@ function fromMartinezPolygon(mpoly: any): Point[] {
     throw new Error('No valid polygon ring found');
 }
 
-function boxToPolygon(box: Box): Point[] {
+export function boxToPolygon(box: Box): Point[] {
     return [
         { left: box.left, top: box.top },    // top-left
         { left: box.right, top: box.top },   // top-right
@@ -128,4 +128,17 @@ export function getIntentPolygons(src: Element, dest: Element, options?: Trailwi
         result.push(destPolygon);
     }
     return result;
+}
+
+
+export function pointInPolygon(point: Point, polygon: Point[]): boolean {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const xi = polygon[i].left, yi = polygon[i].top;
+        const xj = polygon[j].left, yj = polygon[j].top;
+        const intersect = ((yi > point.top) !== (yj > point.top)) &&
+            (point.left < (xj - xi) * (point.top - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
 }

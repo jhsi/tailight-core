@@ -1,4 +1,5 @@
 import type { Point } from "./types/geometry";
+import { pointInPolygon } from "./geometry";
 
 let idCounter = 0;
 const overlays = new Map<number, { svg: SVGSVGElement, polygon: Point[], events?: OverlayEvents }>();
@@ -8,6 +9,8 @@ export type OverlayEvents = Partial<{
     onMouseEnter: (e: MouseEvent) => void;
     onMouseLeave: (e: MouseEvent) => void;
     onMouseMove: (e: MouseEvent) => void;
+    onMouseDown: (e: MouseEvent) => void;
+    onMouseUp: (e: MouseEvent) => void;
 }>;
 
 export function renderOverlay(
@@ -43,6 +46,8 @@ export function renderOverlay(
         if (events.onClick) overlay.addEventListener('click', events.onClick);
         if (events.onMouseEnter) overlay.addEventListener('mouseenter', events.onMouseEnter);
         if (events.onMouseMove) overlay.addEventListener('mousemove', events.onMouseMove);
+        if (events.onMouseDown) overlay.addEventListener('mousedown', events.onMouseDown);
+        if (events.onMouseUp) overlay.addEventListener('mouseup', events.onMouseUp);
         if (events.onMouseLeave) overlay.addEventListener('mouseleave', (e) => {
             const mouse = { left: e.clientX, top: e.clientY };
             let insideAnother = false;
@@ -80,16 +85,4 @@ function removeOverlay(id: number) {
         (overlay.svg.parentNode as HTMLElement).removeChild(overlay.svg);
         overlays.delete(id);
     }
-}
-
-function pointInPolygon(point: { left: number, top: number }, polygon: Point[]): boolean {
-    let inside = false;
-    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-        const xi = polygon[i].left, yi = polygon[i].top;
-        const xj = polygon[j].left, yj = polygon[j].top;
-        const intersect = ((yi > point.top) !== (yj > point.top)) &&
-            (point.left < (xj - xi) * (point.top - yi) / (yj - yi) + xi);
-        if (intersect) inside = !inside;
-    }
-    return inside;
 }
