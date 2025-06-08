@@ -16,6 +16,16 @@
             margin: 0 auto;
             text-align: center;
             font-size: .9rem;
+            overflow: hidden;
+        }
+
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin-top: -4rem;
         }
 
         h1 {
@@ -23,10 +33,11 @@
             font-size: 8rem;
             text-shadow: 0 8px 12px #000;
             margin-bottom: 1rem;
+            margin-top: 0;
         }
 
         a {
-            color: inherit;
+            color: oklch(88.8% 0.027 264.364);
             text-underline-offset: 0.25rem;
             text-decoration-thickness: 0.05rem;
             text-decoration-color: rgba(255, 255, 255, 0.2);
@@ -35,11 +46,11 @@
         .container {
             display: flex;
             gap: 2rem;
-            margin: 6rem 1rem;
+            margin: 4rem 1rem;
         }
 
-        .space-between {
-            justify-content: space-between;
+        .justify-center {
+            justify-content: center;
         }
 
         #source {
@@ -73,20 +84,10 @@
             box-shadow: none;
         }
 
-        .status {
-            /* margin-top: 1rem; */
-            /* padding: 1rem; */
-            /* background: oklch(20.5% 0 0); */
-            /* border-radius: 4px; */
-            transition: background-color 0.2s;
+        .subtitle {
             font-size: 1.15rem;
             font-weight: 400;
             color: oklch(55.1% 0.027 264.364);
-        }
-
-        .status[data-active="true"] {
-            /* background: oklch(92.5% 0.084 155.995); */
-            /* color: oklch(43.2% 0.095 166.913); */
         }
 
         .destination-container {
@@ -105,6 +106,7 @@
             position: absolute;
             width: var(--destination-inline-size);
             height: var(--destination-block-size);
+            top: 24px;
             transform: translate(-100%, 0%);
             background: oklch(20.5% 0 0);
             border: 1px solid oklch(37.1% 0 0);
@@ -119,44 +121,59 @@
             border: 1px solid oklch(37.1% 0 0);
             background: oklch(20.5% 0 0);
         }
+
+        .by {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            color: oklch(55.1% 0.027 264.364);
+        }
+
+        .under-by {
+            position: fixed;
+            top: 32px;
+            right: 16px;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Tailight</h1>
-    <div id="status" class="status" data-active="false">a library to light paths</div>
-
-    <div class="container space-between">
-        <div id="source">show the path</div>
+    <div class="by">
+        an experiment by <a href="https://www.jameshsi.com">jameshsi</a>
+    </div>
+    <div class="under-by">
         <div class="destination-container">
             <div id="destination" class="destination" data-active="false">
             </div>
         </div>
     </div>
-    </div>
+
+    <main>
+        <h1>Tailight</h1>
+        <div class="subtitle">a library to light paths</div>
+
+        <div class="container justify-center">
+            <div id="source">show the path</div>
+        </div>
+    </main>
 
     <script type="module">
         import { createDesirePath } from '@trailwind-core';
 
         const source = document.getElementById('source');
         const destination = document.getElementById('destination');
-        const status = document.getElementById('status');
-        const DEBUG = false;
 
         let desirePath = null;
-        let isInDesirePath = false;
 
         function createDemoDesirePath() {
             return createDesirePath({
                 src: source,
                 dest: destination,
                 onPathMouseEnter: () => {
-                    status.dataset.active = 'true';
                     destination.dataset.active = 'true';
                     destination.textContent = 'stay in the light!';
                 },
                 onPathMouseLeave: () => {
-                    status.dataset.active = 'false';
                     destination.dataset.active = 'false';
                     destination.textContent = 'click & drag';
                     desirePath?.destroy();
