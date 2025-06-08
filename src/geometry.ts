@@ -1,6 +1,5 @@
 import type { TailightConfig } from './types/core';
 import { BOX_BOTTOM_LEFT, BOX_BOTTOM_RIGHT, BOX_TOP_LEFT, BOX_TOP_RIGHT, type Point, type Polygon } from './types/geometry';
-import * as martinez from 'martinez-polygon-clipping';
 
 type Box = {
     left: number;
@@ -31,29 +30,6 @@ export function isValidPolygon(polygon: Polygon): boolean {
     const topRightValid = topRight.top < bottomRight.top && topRight.top < bottomLeft.top;
     const bottomLeftValid = bottomLeft.left < bottomRight.left;
     return topLeftValid && topRightValid && bottomLeftValid;
-}
-
-function union(polygons: Point[][]): Point[] {
-    let result = toMartinezPolygon(polygons[0]);
-    for (let i = 1; i < polygons.length; i++) {
-        result = martinez.union(result, toMartinezPolygon(polygons[i]));
-    }
-    return fromMartinezPolygon(result);
-}
-
-function toMartinezPolygon(points: Point[]): any {
-    return [[points.map(p => [p.left, p.top])]];
-}
-
-function fromMartinezPolygon(mpoly: any): Point[] {
-    if (!Array.isArray(mpoly)) throw new Error('Invalid polygon result');
-    for (const poly of mpoly) {
-        if (Array.isArray(poly) && Array.isArray(poly[0]) && poly[0].length >= 3 && Array.isArray(poly[0][0])) {
-            // poly[0] is a ring of [number, number]
-            return poly[0].map((pt: any) => ({ left: pt[0], top: pt[1] }));
-        }
-    }
-    throw new Error('No valid polygon ring found');
 }
 
 export function boxToPolygon(box: Box): Point[] {
