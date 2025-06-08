@@ -1,5 +1,5 @@
 import { getIntentPolygons } from './geometry';
-import { renderOverlay, removeAllOverlays } from './overlay';
+import { renderOverlay, removeAllOverlays, OverlayEvents } from './overlay';
 import type { TrailwindConfig } from './types/core';
 import { throttle } from './utils/throttle';
 
@@ -9,11 +9,26 @@ export function _createDesirePath(config: TrailwindConfig) {
     const updatePolygons = () => getIntentPolygons(config.src, config.dest, config.options);
     let polygons = updatePolygons();
 
-    if (config.debug) polygons.forEach((polygon, index) => renderOverlay(index, polygon, config.options?.debugOverlayCSSAttributes));
+    const mouseEvents: OverlayEvents = {
+        onClick: () => {
+            config.onPathClick?.();
+        },
+        onMouseEnter: () => {
+            config.onPathMouseEnter?.();
+        },
+        onMouseLeave: () => {
+            config.onPathMouseLeave?.();
+        },
+        onMouseMove: () => {
+            config.onPathMouseMove?.();
+        },
+    };
+
+    if (config.debug) polygons.forEach((polygon, index) => renderOverlay(index, polygon, config.options?.debugOverlayCSSAttributes, mouseEvents));
 
     const throttledUpdate = throttle(() => {
         polygons = updatePolygons();
-        if (config.debug) polygons.forEach((polygon, index) => renderOverlay(index, polygon, config.options?.debugOverlayCSSAttributes));
+        if (config.debug) polygons.forEach((polygon, index) => renderOverlay(index, polygon, config.options?.debugOverlayCSSAttributes, mouseEvents));
     }, THROTTLE_DELAY_MS);
 
     const observer = new ResizeObserver(throttledUpdate);

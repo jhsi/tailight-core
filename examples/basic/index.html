@@ -149,12 +149,12 @@
             return createDesirePath({
                 src: source,
                 dest: destination,
-                onPathEnter: () => {
+                onPathMouseEnter: () => {
                     status.dataset.active = 'true';
                     destination.dataset.active = 'true';
                     console.log('onPathEnter');
                 },
-                onPathLeave: () => {
+                onPathMouseLeave: () => {
                     status.dataset.active = 'false';
                     destination.dataset.active = 'false';
                     desirePath?.destroy();

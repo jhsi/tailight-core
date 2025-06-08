@@ -1,8 +1,10 @@
 export interface TrailwindConfig {
     src: HTMLElement;
     dest: HTMLElement;
-    onPathEnter?: () => void;
-    onPathLeave?: () => void;
+    onPathMouseEnter?: () => void;
+    onPathMouseLeave?: () => void;
+    onPathMouseMove?: () => void;
+    onPathClick?: () => void;
     tolerance?: number;
     debug?: boolean;
     options?: {
