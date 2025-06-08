@@ -146,6 +146,7 @@
             right: 32px;
         }
     </style>
+  <script type="module" crossorigin src="/assets/index-COFBGhye.js"></script>
 </head>
 
 <body>
@@ -169,95 +170,6 @@
         </div>
     </main>
 
-    <script type="module">
-        import { createDesirePath } from '@tailight-core';
-
-        const source = document.getElementById('source');
-        const destination = document.getElementById('destination');
-
-        let desirePath = null;
-
-        function createDemoDesirePath() {
-            return createDesirePath({
-                src: source,
-                dest: destination,
-                onPathMouseEnter: () => {
-                    destination.dataset.active = 'true';
-                    destination.textContent = 'follow the light';
-                },
-                onPathMouseLeave: (e) => {
-                    const destBox = destination.getBoundingClientRect();
-                    if (e.clientX >= destBox.left && e.clientY >= destBox.top && e.clientX <= destBox.right && e.clientY <= destBox.bottom) {
-                        destination.innerHTML = 'you made it :) <br /> take care!';
-                    } else {
-                        destination.dataset.active = 'false';
-                        destination.textContent = 'click & drag';
-                    }
-                    desirePath?.destroy();
-                },
-                tolerance: 0,
-                options: {
-                    include: {
-                        src: true,
-                        dest: false,
-                    },
-                    overlayCSS: {
-                        fill: 'rgba(255,255,255,0.2)',
-                        stroke: 'white',
-                        'stroke-width': '0px',
-                        'stroke-opacity': '0',
-                        'mix-blend-mode': 'multiply',
-                    }
-                },
-                showOverlay: true // Enable the overlay
-            });
-        }
-
-        // add click handlers to destination so it can be dragged & moved
-        let isDragging = false;
-        let startX, startY;
-        let initialLeft, initialTop;
-
-        source.addEventListener('mouseenter', () => {
-            desirePath = createDemoDesirePath();
-        });
-
-        destination.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            isDragging = true;
-            destination.style.cursor = 'grabbing';
-
-            // Get initial positions
-            startX = e.clientX;
-            startY = e.clientY;
-
-            // Get current transform values
-            const transform = new WebKitCSSMatrix(getComputedStyle(destination).transform);
-            initialLeft = transform.m41; // current X translation
-            initialTop = transform.m42;  // current Y translation
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            e.preventDefault();
-            e.stopPropagation();
-
-            const deltaX = e.clientX - startX;
-            const deltaY = e.clientY - startY;
-
-            // Use transform consistently
-            destination.style.transform = `translate(calc(${initialLeft + deltaX}px), calc(${initialTop + deltaY}px))`;
-            desirePath = createDemoDesirePath();
-        });
-
-        document.addEventListener('mouseup', (e) => {
-            if (!isDragging) return;
-            isDragging = false;
-            destination.style.cursor = 'grab';
-        });
-
-    </script>
 </body>
 
 </html>

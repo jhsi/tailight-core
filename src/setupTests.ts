@@ -1,1 +1,0 @@
-// JSDOM environment is already set; add any polyfills or mocks here
