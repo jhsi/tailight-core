@@ -3,6 +3,8 @@
 ## About
 Tailight.js is a library created to help create hoverable desire paths between any two HTML elements. It also can be used to create a light path between two boxed divs.
 
+Want to see the live example? [View it by clicking here](www.jameshsi.com/tailight)
+
 ## Installation
 
 ```bash
