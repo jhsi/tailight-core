@@ -1,8 +1,4 @@
 import { BOX_BOTTOM_LEFT, BOX_BOTTOM_RIGHT, BOX_TOP_LEFT, BOX_TOP_RIGHT, type Point, type Polygon } from './types/geometry';
-import * as martinez from 'martinez-polygon-clipping';
-import { throttle } from './utils/throttle';
-// Add import for martinez-polygon-clipping if available
-// import martinez from 'martinez-polygon-clipping';
 
 type Box = {
     left: number;
@@ -45,39 +41,8 @@ function boxToPolygon(box: Box): Point[] {
     ];
 }
 
-function toMartinezPolygon(points: Point[]): any {
-    return [[points.map(p => [p.left, p.top])]];
-}
-
-function fromMartinezPolygon(mpoly: any): Point[] {
-    if (!Array.isArray(mpoly)) throw new Error('Invalid polygon result');
-    for (const poly of mpoly) {
-        if (Array.isArray(poly) && Array.isArray(poly[0]) && poly[0].length >= 3 && Array.isArray(poly[0][0])) {
-            // poly[0] is a ring of [number, number]
-            return poly[0].map((pt: any) => ({ left: pt[0], top: pt[1] }));
-        }
-    }
-    throw new Error('No valid polygon ring found');
-}
-
-function union(polygons: Point[][]): Point[] {
-    let result = toMartinezPolygon(polygons[0]);
-    for (let i = 1; i < polygons.length; i++) {
-        result = martinez.union(result, toMartinezPolygon(polygons[i]));
-    }
-    return fromMartinezPolygon(result);
-}
-
-function subtract(subject: Point[], clips: Point[][]): Point[] {
-    let result = toMartinezPolygon(subject);
-    for (let i = 0; i < clips.length; i++) {
-        result = martinez.diff(result, toMartinezPolygon(clips[i]));
-    }
-    return fromMartinezPolygon(result);
-}
-
 // Generalized: connect two polygons (not just boxes)
-export function getIntentPolygonBetweenPolygons(src: Polygon, dest: Polygon): Point[] {
+export function getIntentPolygonBetweenPolygons(src: Point[], dest: Point[]): Point[] {
     let result: Point[] = [];
 
     // upper or lower quadrants relative to src
@@ -141,7 +106,7 @@ export function getIntentPolygon(src: Element, dest: Element, options = { svg: f
 // Ray-casting algorithm for point-in-polygon
 export function pointInPolygon(
     point: Point,
-    vs: Polygon
+    vs: Point[]
 ): boolean {
     let inside = false;
     for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
@@ -153,16 +118,4 @@ export function pointInPolygon(
         if (intersect) inside = !inside;
     }
     return inside;
-}
-
-function angleSortedPoints(points: Point[]): Point[] {
-    // 1. Compute centroid
-    const cx = points.reduce((sum, p) => sum + p.left, 0) / points.length;
-    const cy = points.reduce((sum, p) => sum + p.top, 0) / points.length;
-    // 2. Sort by angle from centroid
-    return points.slice().sort((a, b) => {
-        const angleA = Math.atan2(a.top - cy, a.left - cx);
-        const angleB = Math.atan2(b.top - cy, b.left - cx);
-        return angleA - angleB;
-    });
 }

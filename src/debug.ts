@@ -1,8 +1,8 @@
-import type { Polygon } from "./types/geometry";
+import type { Point } from "./types/geometry";
 
 let overlay: SVGPolygonElement | null = null;
 
-export function renderDebugOverlay(polygon: Polygon, cssAttributes: Record<string, string> = {}) {
+export function renderDebugOverlay(polygon: Point[], cssAttributes: Record<string, string> = {}) {
     removeDebugOverlay();
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
