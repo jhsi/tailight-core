@@ -112,6 +112,7 @@
             background: oklch(20.5% 0 0);
             border: 1px solid oklch(37.1% 0 0);
             border-radius: 0;
+            line-height: 1.45em;
         }
 
         /* Styles for the destination when the desire path is active */
@@ -178,7 +179,7 @@
                 onPathMouseLeave: (e) => {
                     const destBox = destination.getBoundingClientRect();
                     if (e.clientX >= destBox.left && e.clientY >= destBox.top && e.clientX <= destBox.right && e.clientY <= destBox.bottom) {
-                        destination.textContent = 'you made it! :)';
+                        destination.innerHTML = 'you made it :) <br /> take care!';
                     } else {
                         destination.dataset.active = 'false';
                         destination.textContent = 'click & drag';
