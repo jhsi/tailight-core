@@ -1,6 +1,6 @@
 src/
 ├── index.ts              # Main export
-├── core.ts               # Logic for tracking and hit-testing
+├── core.ts               # Core instantiation, handling of events
 ├── geometry.ts           # Triangle and point-in-polygon math
-└── debug.ts              # Optional SVG overlay renderer
+└── overlay.ts            # Optional SVG overlay renderer
 
