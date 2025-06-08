@@ -1,21 +1,20 @@
-import { getIntentPolygon, pointInPolygon } from './geometry';
-import { renderDebugOverlay, removeDebugOverlay } from './debug';
+import { getIntentPolygons, pointInPolygon } from './geometry';
+import { renderOverlay, removeAllOverlays } from './overlay';
 import type { TrailwindConfig } from './types/core';
 import { throttle } from './utils/throttle';
 
 const THROTTLE_DELAY_MS = 50; // 60+fps
 
-export function internalCreateDesirePath(config: TrailwindConfig) {
+export function _createDesirePath(config: TrailwindConfig) {
     let isInside = false;
 
-    const updatePolygon = () =>
-        getIntentPolygon(config.src, config.dest);
+    const updatePolygon = () => getIntentPolygons(config.src, config.dest, config.options);
 
-    let polygon = updatePolygon();
+    let polygons = updatePolygon();
 
     function onMouseMove(e: MouseEvent) {
         const point = { left: e.clientX, top: e.clientY };
-        const inside = pointInPolygon(point, polygon);
+        const inside = polygons.some(polygon => pointInPolygon(point, polygon));
         if (inside && !isInside) {
             isInside = true;
             config.onPathEnter?.();
@@ -25,11 +24,11 @@ export function internalCreateDesirePath(config: TrailwindConfig) {
         }
     }
 
-    if (config.debug) renderDebugOverlay(polygon, config.options?.debugOverlayCSSAttributes);
+    if (config.debug) polygons.forEach((polygon, index) => renderOverlay(index, polygon, config.options?.debugOverlayCSSAttributes));
 
     const throttledUpdate = throttle(() => {
-        polygon = updatePolygon();
-        if (config.debug) renderDebugOverlay(polygon, config.options?.debugOverlayCSSAttributes);
+        polygons = updatePolygon();
+        if (config.debug) polygons.forEach((polygon, index) => renderOverlay(index, polygon, config.options?.debugOverlayCSSAttributes));
     }, THROTTLE_DELAY_MS);
 
     const observer = new ResizeObserver(throttledUpdate);
@@ -44,7 +43,7 @@ export function internalCreateDesirePath(config: TrailwindConfig) {
             window.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('resize', throttledUpdate);
             observer.disconnect();
-            if (config.debug) removeDebugOverlay();
+            if (config.debug) removeAllOverlays();
         },
     };
 }

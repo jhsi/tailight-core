@@ -155,11 +155,11 @@
                 },
                 onPathLeave: () => {
                     if (!isInDesirePath) return;
-                    // isInDesirePath = false;
-                    // status.dataset.active = 'false';
-                    // destination.dataset.active = 'false';
-                    // desirePath?.destroy();
-                    // desirePath = null;
+                    isInDesirePath = false;
+                    status.dataset.active = 'false';
+                    destination.dataset.active = 'false';
+                    desirePath?.destroy();
+                    desirePath = null;
                 },
                 tolerance: 0,
                 options: {

@@ -1,9 +1,10 @@
 import type { Point } from "./types/geometry";
 
-let overlay: SVGPolygonElement | null = null;
+let idCounter = 0;
+const overlays = new Map<number, SVGPolygonElement>();
 
-export function renderDebugOverlay(polygon: Point[], cssAttributes: Record<string, string> = {}) {
-    removeDebugOverlay();
+export function renderOverlay(id: number, polygon: Point[], cssAttributes: Record<string, string> = {}) {
+    removeOverlay(id);
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.style.position = 'fixed';
@@ -14,7 +15,7 @@ export function renderDebugOverlay(polygon: Point[], cssAttributes: Record<strin
     svg.style.pointerEvents = 'none';
     svg.style.zIndex = '9999';
 
-    overlay = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
     overlay.setAttribute('fill', 'rgba(255,0,0,0.2)');
     overlay.setAttribute('stroke', 'red');
     overlay.setAttribute('stroke-width', '1');
@@ -27,11 +28,25 @@ export function renderDebugOverlay(polygon: Point[], cssAttributes: Record<strin
 
     svg.appendChild(overlay);
     document.body.appendChild(svg);
+
+    const overlayId = id ?? idCounter++;
+    overlays.set(overlayId, overlay);
+    return overlayId;
 }
 
-export function removeDebugOverlay() {
+export function removeAllOverlays() {
+    overlays.forEach((overlay, id) => {
+        if (overlay && overlay.parentNode) {
+            (overlay.parentNode as HTMLElement).removeChild(overlay);
+            overlays.delete(id);
+        }
+    });
+}
+
+function removeOverlay(id: number) {
+    const overlay = overlays.get(id);
     if (overlay && overlay.parentNode) {
         (overlay.parentNode as HTMLElement).removeChild(overlay);
-        overlay = null;
+        overlays.delete(id);
     }
 }

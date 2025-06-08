@@ -1,4 +1,6 @@
+import type { TrailwindConfig } from './types/core';
 import { BOX_BOTTOM_LEFT, BOX_BOTTOM_RIGHT, BOX_TOP_LEFT, BOX_TOP_RIGHT, type Point, type Polygon } from './types/geometry';
+import * as martinez from 'martinez-polygon-clipping';
 
 type Box = {
     left: number;
@@ -31,7 +33,29 @@ export function isValidPolygon(polygon: Polygon): boolean {
     return topLeftValid && topRightValid && bottomLeftValid;
 }
 
-// Helper: Convert Box to 4-point polygon
+function union(polygons: Point[][]): Point[] {
+    let result = toMartinezPolygon(polygons[0]);
+    for (let i = 1; i < polygons.length; i++) {
+        result = martinez.union(result, toMartinezPolygon(polygons[i]));
+    }
+    return fromMartinezPolygon(result);
+}
+
+function toMartinezPolygon(points: Point[]): any {
+    return [[points.map(p => [p.left, p.top])]];
+}
+
+function fromMartinezPolygon(mpoly: any): Point[] {
+    if (!Array.isArray(mpoly)) throw new Error('Invalid polygon result');
+    for (const poly of mpoly) {
+        if (Array.isArray(poly) && Array.isArray(poly[0]) && poly[0].length >= 3 && Array.isArray(poly[0][0])) {
+            // poly[0] is a ring of [number, number]
+            return poly[0].map((pt: any) => ({ left: pt[0], top: pt[1] }));
+        }
+    }
+    throw new Error('No valid polygon ring found');
+}
+
 function boxToPolygon(box: Box): Point[] {
     return [
         { left: box.left, top: box.top },    // top-left
@@ -89,13 +113,21 @@ export function getIntentPolygonBetweenPolygons(src: Point[], dest: Point[]): Po
 }
 
 // Accepts two polygons (Point[]), not just boxes or elements
-export function getIntentPolygon(src: Element, dest: Element, options = { svg: false }): Point[] {
-    if (!options.svg) {
-        const srcPolygon = boxToPolygon(getBoxFromElement(src));
-        const destPolygon = boxToPolygon(getBoxFromElement(dest));
-        return getIntentPolygonBetweenPolygons(srcPolygon, destPolygon);
+const DEFAULT_OPTIONS_INCLUDES = { dest: true, src: false };
+
+export function getIntentPolygons(src: Element, dest: Element, options?: TrailwindConfig['options']): Array<Point[]> {
+    const srcPolygon = boxToPolygon(getBoxFromElement(src));
+    const destPolygon = boxToPolygon(getBoxFromElement(dest));
+    const pathPolygon = getIntentPolygonBetweenPolygons(srcPolygon, destPolygon);
+
+    let result = [pathPolygon];
+    if (options?.include?.src ?? DEFAULT_OPTIONS_INCLUDES.src) {
+        result.push(srcPolygon);
     }
-    return []; // TODO: Implement SVG support
+    if (options?.include?.dest ?? DEFAULT_OPTIONS_INCLUDES.dest) {
+        result.push(destPolygon);
+    }
+    return result;
 }
 
 // If you want to support Elements or Boxes, use boxToPolygon first:
