@@ -101,35 +101,26 @@ export function getIntentPolygonBetweenPolygons(src: Polygon, dest: Polygon): Po
     const betweenQIIIandQIV = destQIII && destQIV;
     const betweenQIandQIV = destQI && destQIV;
 
+    // ordering matters here, clockwise from src
     if (betweenQIandQII) {
-        result = [src[BOX_BOTTOM_LEFT], src[BOX_BOTTOM_RIGHT], dest[BOX_BOTTOM_LEFT], dest[BOX_BOTTOM_RIGHT]];
+        result = [src[BOX_BOTTOM_LEFT], dest[BOX_BOTTOM_LEFT], dest[BOX_BOTTOM_RIGHT], src[BOX_BOTTOM_RIGHT]];
     } else if (betweenQIIandQIII) {
-        result = [src[BOX_TOP_RIGHT], src[BOX_BOTTOM_LEFT], dest[BOX_TOP_RIGHT], dest[BOX_BOTTOM_LEFT]];
+        result = [src[BOX_TOP_RIGHT], src[BOX_BOTTOM_RIGHT], dest[BOX_BOTTOM_RIGHT], dest[BOX_TOP_RIGHT]];
     } else if (betweenQIIIandQIV) {
-        result = [src[BOX_TOP_LEFT], src[BOX_TOP_RIGHT], dest[BOX_TOP_LEFT], dest[BOX_TOP_RIGHT]];
+        result = [src[BOX_TOP_LEFT], src[BOX_TOP_RIGHT], dest[BOX_TOP_RIGHT], dest[BOX_TOP_LEFT]];
     } else if (betweenQIandQIV) {
-        result = [src[BOX_TOP_LEFT], src[BOX_BOTTOM_LEFT], dest[BOX_TOP_LEFT], dest[BOX_BOTTOM_LEFT]];
+        result = [src[BOX_TOP_LEFT], dest[BOX_TOP_LEFT], dest[BOX_BOTTOM_LEFT], src[BOX_BOTTOM_LEFT]];
     } else if (destQI) {
-        const path = [src[BOX_TOP_LEFT], src[BOX_BOTTOM_RIGHT], src[BOX_TOP_RIGHT], dest[BOX_TOP_LEFT], dest[BOX_BOTTOM_RIGHT], dest[BOX_BOTTOM_LEFT]];
-        result = path;
+        result = [src[BOX_TOP_LEFT], dest[BOX_TOP_LEFT], dest[BOX_BOTTOM_LEFT], dest[BOX_BOTTOM_RIGHT], src[BOX_BOTTOM_RIGHT], src[BOX_TOP_RIGHT]];
     } else if (destQII) {
-        const path = [src[BOX_TOP_LEFT], src[BOX_TOP_RIGHT], src[BOX_BOTTOM_LEFT], dest[BOX_BOTTOM_LEFT], dest[BOX_BOTTOM_RIGHT], dest[BOX_TOP_RIGHT]];
-        result = path;
+        result = [src[BOX_TOP_LEFT], src[BOX_BOTTOM_LEFT], dest[BOX_BOTTOM_LEFT], dest[BOX_BOTTOM_RIGHT], dest[BOX_TOP_RIGHT], src[BOX_TOP_RIGHT]];
     } else if (destQIII) {
-        const path = [src[BOX_TOP_LEFT], src[BOX_BOTTOM_RIGHT], src[BOX_BOTTOM_LEFT], dest[BOX_TOP_LEFT], dest[BOX_TOP_RIGHT], dest[BOX_BOTTOM_RIGHT]];
-        result = path;
+        result = [src[BOX_TOP_LEFT], src[BOX_BOTTOM_LEFT], src[BOX_BOTTOM_RIGHT], dest[BOX_BOTTOM_RIGHT], dest[BOX_TOP_RIGHT], dest[BOX_TOP_LEFT]];
     } else if (destQIV) {
-        const path = [src[BOX_BOTTOM_LEFT], src[BOX_BOTTOM_RIGHT], src[BOX_TOP_RIGHT], dest[BOX_TOP_LEFT], dest[BOX_TOP_RIGHT], dest[BOX_BOTTOM_LEFT]];
-        result = path;
+        result = [src[BOX_BOTTOM_LEFT], src[BOX_BOTTOM_RIGHT], src[BOX_TOP_RIGHT], dest[BOX_TOP_RIGHT], dest[BOX_TOP_LEFT], dest[BOX_BOTTOM_LEFT]];
     }
 
-    throttle(() => {
-        setTimeout(() => {
-            console.log('> quadrant:', [destQI, destQII, destQIII, destQIV]);
-        }, 1);
-    }, 1000)();
-
-    return angleSortedPoints(result);
+    return result;
 }
 
 // Accepts two polygons (Point[]), not just boxes or elements
