@@ -7,7 +7,7 @@
     <title>Trailwind Core - Basic Example</title>
     <style>
         body {
-            --box-size: 128px;
+            --box-size: 96px;
             font-family: system-ui, -apple-system, sans-serif;
             padding: 2rem 4rem;
             background: oklch(13% 0.028 261.692);
@@ -15,6 +15,7 @@
             max-width: 480px;
             margin: 0 auto;
             text-align: center;
+            font-size: .9rem;
         }
 
         h1 {
@@ -22,6 +23,13 @@
             font-size: 8rem;
             text-shadow: 0 8px 12px #000;
             margin-bottom: 1rem;
+        }
+
+        a {
+            color: inherit;
+            text-underline-offset: 0.25rem;
+            text-decoration-thickness: 0.05rem;
+            text-decoration-color: rgba(255, 255, 255, 0.2);
         }
 
         .container {
@@ -34,42 +42,34 @@
             justify-content: space-between;
         }
 
-        .button {
-            width: var(--box-size);
-            height: calc(var(--box-size) / 3);
+        #source {
+            width: calc(var(--box-size) * 1.5);
             background: oklch(42.4% 0.199 265.638);
             border: 1px solid oklch(37.9% 0.146 265.522);
-            border-radius: 8px;
             transition: all 0.12s;
             cursor: pointer;
             background-color: #FFFFFF;
-            border: 0;
-            border-radius: .5rem;
             box-sizing: border-box;
             color: #111827;
             font-weight: 600;
-            line-height: 1.25rem;
             padding: .75rem 1rem;
             text-align: center;
-            text-decoration: none #D1D5DB solid;
-            text-decoration-thickness: auto;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
             cursor: pointer;
             user-select: none;
             -webkit-user-select: none;
             touch-action: manipulation;
         }
 
-        .button:hover {
+        #source:hover {
             background-color: rgb(249, 250, 251);
         }
 
-        .button:focus {
+        #source:focus {
             outline: 2px solid transparent;
             outline-offset: 2px;
         }
 
-        .button:focus-visible {
+        #source:focus-visible {
             box-shadow: none;
         }
 
@@ -94,7 +94,7 @@
         }
 
         .destination {
-            --destination-inline-size: calc(var(--box-size) * 1.619);
+            --destination-inline-size: calc(var(--box-size) * 2);
             --destination-block-size: calc(var(--box-size));
             opacity: 0.25;
             display: flex;
@@ -127,9 +127,10 @@
     <div id="status" class="status" data-active="false">a library to light paths</div>
 
     <div class="container space-between">
-        <button id="source" class="button">here</button>
+        <div id="source">show the path</div>
         <div class="destination-container">
-            <div id="destination" class="destination" data-active="false">there</div>
+            <div id="destination" class="destination" data-active="false">
+            </div>
         </div>
     </div>
     </div>
@@ -152,14 +153,20 @@
                 onPathMouseEnter: () => {
                     status.dataset.active = 'true';
                     destination.dataset.active = 'true';
+                    destination.textContent = 'stay in the light!';
                 },
                 onPathMouseLeave: () => {
                     status.dataset.active = 'false';
                     destination.dataset.active = 'false';
+                    destination.textContent = 'click & drag';
                     desirePath?.destroy();
                 },
                 tolerance: 0,
                 options: {
+                    include: {
+                        src: true,
+                        dest: false,
+                    },
                     debugOverlayCSSAttributes: {
                         fill: 'rgba(255,255,255,0.2)',
                         stroke: 'white',
