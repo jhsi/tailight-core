@@ -6,6 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tailight - Example</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
         body {
             --box-size: 96px;
             font-family: system-ui, -apple-system, sans-serif;
@@ -126,15 +135,15 @@
 
         .by {
             position: absolute;
-            top: 12px;
-            right: 16px;
+            bottom: 24px;
+            right: 36px;
             color: oklch(55.1% 0.027 264.364);
         }
 
-        .under-by {
-            position: fixed;
-            top: 32px;
-            right: 16px;
+        .above-by {
+            position: absolute;
+            bottom: calc(var(--box-size) + 80px);
+            right: 32px;
         }
     </style>
 </head>
@@ -143,7 +152,7 @@
     <div class="by">
         an experiment by <a href="https://www.jameshsi.com">jameshsi</a>
     </div>
-    <div class="under-by">
+    <div class="above-by">
         <div class="destination-container">
             <div id="destination" class="destination" data-active="false">
             </div>

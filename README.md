@@ -66,8 +66,10 @@ Creates a new desire path between two elements.
 
 ## Directory structure
 
+```
 src/
 ├── index.ts              # Main export
 ├── core.ts               # Core instantiation, handling of events
 ├── geometry.ts           # Triangle and point-in-polygon math
 └── overlay.ts            # Optional SVG overlay renderer 
+```
