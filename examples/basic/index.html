@@ -171,11 +171,16 @@
                 dest: destination,
                 onPathMouseEnter: () => {
                     destination.dataset.active = 'true';
-                    destination.textContent = 'stay in the light!';
+                    destination.textContent = 'follow the light';
                 },
-                onPathMouseLeave: () => {
-                    destination.dataset.active = 'false';
-                    destination.textContent = 'click & drag';
+                onPathMouseLeave: (e) => {
+                    const destBox = destination.getBoundingClientRect();
+                    if (e.clientX >= destBox.left && e.clientY >= destBox.top && e.clientX <= destBox.right && e.clientY <= destBox.bottom) {
+                        destination.textContent = 'you made it! :)';
+                    } else {
+                        destination.dataset.active = 'false';
+                        destination.textContent = 'click & drag';
+                    }
                     desirePath?.destroy();
                 },
                 tolerance: 0,
