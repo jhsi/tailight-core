@@ -1,6 +1,6 @@
-# Trailwind Core Examples
+# Tailight Core Examples
 
-This directory contains an example (titled Tailight) demonstrating how to use the Trailwind Core library.
+This directory contains an example demonstrating how to use the Tailight Core library.
 
 ## Running the Examples
 

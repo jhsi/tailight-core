@@ -1,4 +1,4 @@
-import type { TrailwindConfig } from './types/core';
+import type { TailightConfig } from './types/core';
 import { BOX_BOTTOM_LEFT, BOX_BOTTOM_RIGHT, BOX_TOP_LEFT, BOX_TOP_RIGHT, type Point, type Polygon } from './types/geometry';
 import * as martinez from 'martinez-polygon-clipping';
 
@@ -115,7 +115,7 @@ export function getIntentPolygonBetweenPolygons(src: Point[], dest: Point[]): Po
 // Accepts two polygons (Point[]), not just boxes or elements
 const DEFAULT_OPTIONS_INCLUDES = { dest: true, src: false };
 
-export function getIntentPolygons(src: Element, dest: Element, options?: TrailwindConfig['options']): Array<Point[]> {
+export function getIntentPolygons(src: Element, dest: Element, options?: TailightConfig['options']): Array<Point[]> {
     const srcPolygon = boxToPolygon(getBoxFromElement(src));
     const destPolygon = boxToPolygon(getBoxFromElement(dest));
     const pathPolygon = getIntentPolygonBetweenPolygons(srcPolygon, destPolygon);

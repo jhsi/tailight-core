@@ -1,4 +1,4 @@
-export interface TrailwindConfig {
+export interface TailightConfig {
     src: HTMLElement;
     dest: HTMLElement;
     onPathMouseEnter?: (e: MouseEvent) => void;
@@ -8,12 +8,12 @@ export interface TrailwindConfig {
     onPathMouseUp?: (e: MouseEvent) => void;
     onPathClick?: (e: MouseEvent) => void;
     tolerance?: number;
-    debug?: boolean;
+    showOverlay?: boolean;
     options?: {
         include?: {
             dest?: boolean; // if true, the destination will be included in the polygon. defaults true
             src?: boolean; // if true, the source will be included in the polygon. defaults false
         };
-        debugOverlayCSSAttributes?: Record<string, string>;
+        overlayCSS?: Record<string, string>;
     };
 }

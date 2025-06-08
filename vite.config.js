@@ -9,8 +9,8 @@ export default defineConfig({
     build: {
         lib: {
             entry: 'src/index.ts',
-            name: 'trailwind-core',
-            fileName: (format) => `trailwind-core.${format}.js`,
+            name: 'tailight-core',
+            fileName: (format) => `tailight-core.${format}.js`,
         },
         rollupOptions: {
             // externalize deps (if needed)

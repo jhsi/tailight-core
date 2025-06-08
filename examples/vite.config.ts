@@ -12,7 +12,7 @@ export default defineConfig({
     },
     resolve: {
         alias: {
-            '@trailwind-core': resolve(__dirname, '../dist/trailwind-core.es.js')
+            '@tailight-core': resolve(__dirname, '../dist/tailight-core.es.js')
         }
     }
 }); 

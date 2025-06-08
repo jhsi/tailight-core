@@ -1,11 +1,11 @@
 import { boxToPolygon, getBoxFromElement, getIntentPolygons, pointInPolygon } from './geometry';
 import { renderOverlay, removeAllOverlays, OverlayEvents } from './overlay';
-import type { TrailwindConfig } from './types/core';
+import type { TailightConfig } from './types/core';
 import { throttle } from './utils/throttle';
 
 const THROTTLE_DELAY_MS = 50; // 60+fps
 
-function propagateToUnderlying(e: MouseEvent, config: TrailwindConfig, type: string) {
+function propagateToUnderlying(e: MouseEvent, config: TailightConfig, type: string) {
     const point = { left: e.clientX, top: e.clientY };
     const isInDestination = pointInPolygon(point, boxToPolygon(getBoxFromElement(config.dest)));
     const isInSource = pointInPolygon(point, boxToPolygon(getBoxFromElement(config.src)));
@@ -16,7 +16,7 @@ function propagateToUnderlying(e: MouseEvent, config: TrailwindConfig, type: str
     }
 }
 
-export function _createDesirePath(config: TrailwindConfig) {
+export function _createDesirePath(config: TailightConfig) {
     const updatePolygons = () => getIntentPolygons(config.src, config.dest, config.options);
     let polygons = updatePolygons();
 
@@ -45,11 +45,11 @@ export function _createDesirePath(config: TrailwindConfig) {
         },
     };
 
-    if (config.debug) polygons.forEach((polygon, index) => renderOverlay(index, polygon, config.options?.debugOverlayCSSAttributes, mouseEvents));
+    if (config.showOverlay) polygons.forEach((polygon, index) => renderOverlay(index, polygon, config.options?.overlayCSS, mouseEvents));
 
     const throttledUpdate = throttle(() => {
         polygons = updatePolygons();
-        if (config.debug) polygons.forEach((polygon, index) => renderOverlay(index, polygon, config.options?.debugOverlayCSSAttributes, mouseEvents));
+        if (config.showOverlay) polygons.forEach((polygon, index) => renderOverlay(index, polygon, config.options?.overlayCSS, mouseEvents));
     }, THROTTLE_DELAY_MS);
 
     const observer = new ResizeObserver(throttledUpdate);
@@ -62,7 +62,7 @@ export function _createDesirePath(config: TrailwindConfig) {
         destroy() {
             window.removeEventListener('resize', throttledUpdate);
             observer.disconnect();
-            if (config.debug) removeAllOverlays();
+            if (config.showOverlay) removeAllOverlays();
         },
     };
 }

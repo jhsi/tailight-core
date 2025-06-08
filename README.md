@@ -6,7 +6,7 @@ Tailight.js is a library created to help create hoverable desire paths between a
 ## Installation
 
 ```bash
-npm install @trailwind-core
+npm install @tailight-core
 ```
 
 ## Usage
@@ -14,7 +14,7 @@ npm install @trailwind-core
 Import the library and create a desire path between two HTML elements:
 
 ```javascript
-import { createDesirePath } from '@trailwind-core';
+import { createDesirePath } from '@tailight-core';
 
 const desirePath = createDesirePath({
     src: sourceElement,      // Source HTML element
@@ -31,7 +31,7 @@ const desirePath = createDesirePath({
             src: true,       // Optional: Include source element in path
             dest: false      // Optional: Include destination element in path
         },
-        debugOverlayCSSAttributes: {
+        overlayCSS: {
             // Optional: Customize debug overlay appearance
             fill: 'rgba(255,255,255,0.2)',
             stroke: 'white',
@@ -40,7 +40,7 @@ const desirePath = createDesirePath({
             'mix-blend-mode': 'multiply'
         }
     },
-    debug: true              // Optional: Enable debug mode to see the polygon
+    showOverlay: true              // Optional: Enable the overlay
 });
 
 // Clean up when done
@@ -62,7 +62,7 @@ Creates a new desire path between two elements.
 | `onPathMouseEnter` | Function | Callback when mouse enters path |
 | `onPathMouseLeave` | Function | Callback when mouse leaves path |
 | `options` | Object | Additional configuration options |
-| `debug` | boolean | Enable debug mode |
+| `showOverlay` | boolean | Enable debug mode which shows the overlay |
 
 ## Directory structure
 
